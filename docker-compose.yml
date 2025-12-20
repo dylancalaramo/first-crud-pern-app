@@ -1,0 +1,35 @@
+version: "3"
+services:
+  db:
+    container_name: postgres
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_PASSWORD=Ediwow1234
+      - POSTGRES_USER=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=db123
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/data/postgres
+
+  app:
+    container_name: node-app
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_PORT=5000
+      - POSTGRES_HOST=db
+      - POSTGRES_PASSWORD=Ediwow1234
+      - POSTGRES_USER=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=db123
+    ports:
+      - "5000:5000"
+
+volumes:
+  db:
