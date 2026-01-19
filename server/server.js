@@ -1,4 +1,4 @@
-require("dotenv").config({ path: "../.env" || "./env" });
+// require("dotenv").config({ path: "../.env" || "./env" });
 const express = require("express");
 const app = express();
 const { pool } = require("./db");
@@ -12,7 +12,7 @@ app.use(cors());
 //routes
 app.get("/", async (req, res) => {
   try {
-    const rows = await pool.query("SELECT * FROM schools");
+    const rows = await pool.query("SELECT * FROM todo");
     res.status(200).send(rows.rows);
   } catch (err) {
     console.log(err);
@@ -24,7 +24,7 @@ app.get("/", async (req, res) => {
 app.post("/", async (req, res) => {
   const { name, location } = req.body;
   try {
-    await pool.query("INSERT INTO schools (name, address) VALUES ($1, $2)", [
+    await pool.query("INSERT INTO todo (name, address) VALUES ($1, $2)", [
       name,
       location,
     ]);
@@ -39,7 +39,7 @@ app.post("/", async (req, res) => {
 app.get("setup", async (req, res) => {
   try {
     await pool.query(
-      "CREATE TABLE schools( id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, address VARCHAR(255) NOT NULL"
+      "CREATE TABLE todo( id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, address VARCHAR(255) NOT NULL"
     );
     res.status(200).send("Succesfully created the table");
   } catch (err) {
