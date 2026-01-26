@@ -1,17 +1,32 @@
+import { Trash } from "lucide-react";
+import { useEditAndDeleteTaskContext } from "../context/editAndDeleteMode";
 import { useTheme } from "../context/theme";
 
 export const TodoHeader = () => {
   const { theme } = useTheme();
+  const { isDeleteMode } = useEditAndDeleteTaskContext();
   return (
     <div
       className={`${theme === "light" ? "bg-neutral-100" : "bg-gray-800 "}
-        grid grid-cols-5 w-full shadow-md font-bold h-7 rounded-tl-md rounded-tr-md *:px-2
-        [&>*:not(:last-child)]:border-r *:w-full *:flex *:justify-center *:items-center`}
+        grid ${
+          isDeleteMode ? "grid-cols-9" : "grid-cols-4"
+        } w-full shadow-md font-bold h-10 rounded-tl-md rounded-tr-md
+        [&>span:not(#end)]:border-r *:w-full *:flex *:justify-center *:items-center`}
     >
-      <span>ID</span>
-      <span className="col-span-2">Task</span>
-      <span>Created at</span>
-      <span>Options</span>
+      <span className={`${isDeleteMode ? "col-span-4" : "col-span-2"}`}>
+        Task
+      </span>
+      <span className={`${isDeleteMode ? "col-span-2" : "col-span-1"}`}>
+        Deadline
+      </span>
+      <span className={`${isDeleteMode ? "col-span-2" : "col-span-1"}`}>
+        Created at
+      </span>
+      {isDeleteMode && (
+        <div className={`${isDeleteMode ? "block" : "hidden"}`}>
+          <Trash height={20} />
+        </div>
+      )}
     </div>
   );
 };

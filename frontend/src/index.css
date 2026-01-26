@@ -33,9 +33,19 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: "League-Spartan";
+  src: local("League-Spartan"),
+    url("./assets//fonts/LeagueSpartan-Bold.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  descent-override: 5%;
+}
+
 @theme {
   --font-bowlby: "Bowlby-One", sans-serif;
   --font-bree-serif: "Bree-Serif", sans-serif;
   --font-open-sans: "Open-Sans", sans-serif;
   --font-open-sans: "Roboto", sans-serif;
+  --font-league-spartan: "League-Spartan", sans-serif;
 }

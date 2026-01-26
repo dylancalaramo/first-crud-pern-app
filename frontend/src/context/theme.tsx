@@ -1,9 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 
-interface Props {
-  children?: ReactNode;
-}
-
 export interface Theme {
   theme: string;
   toggleTheme: () => void;
@@ -11,7 +7,7 @@ export interface Theme {
 
 const ThemeContext = createContext<Theme | undefined>(undefined);
 
-export const ThemeProvider = ({ children }: Props) => {
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<string>("light");
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");

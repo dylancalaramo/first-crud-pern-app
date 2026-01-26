@@ -22,11 +22,11 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/", async (req, res) => {
-  const { name, location } = req.body;
+  const { task, deadline } = req.body;
   try {
-    await pool.query("INSERT INTO todo (name, address) VALUES ($1, $2)", [
-      name,
-      location,
+    await pool.query("INSERT INTO todo (task, deadline) VALUES ($1, $2)", [
+      task,
+      deadline,
     ]);
     res.status(200).send("Succesfully added a row");
   } catch (err) {
@@ -36,16 +36,18 @@ app.post("/", async (req, res) => {
   }
 });
 
-app.get("setup", async (req, res) => {
+app.delete("/", async (req, res) => {
+  const { ids } = req.body;
+  if (!ids || ids.length === 0) {
+    res.status(400).send({ message: "No ids are selected" });
+  }
+
   try {
-    await pool.query(
-      "CREATE TABLE todo( id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, address VARCHAR(255) NOT NULL"
-    );
-    res.status(200).send("Succesfully created the table");
+    await pool.query("DELETE FROM todo WHERE id = ANY($1)", [ids]);
+    res.status(200).send(`Successfully deleted ${ids.length} rows`);
   } catch (err) {
-    console.log(err);
-    //Change the send message when in prod
-    res.status(400).send(`${err.message}`);
+    console.error("Database Error", error.message);
+    res.status(500).send({ message: "Server error" });
   }
 });
 
