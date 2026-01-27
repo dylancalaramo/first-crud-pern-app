@@ -1,6 +1,7 @@
 import { useEffect, useState, type SetStateAction } from "react";
 import type { TodoType } from "../App";
 import { useTheme } from "../context/theme";
+import { TextInput } from "./TextInput";
 
 export const Searchbar = ({
   // currentTasks
@@ -28,25 +29,15 @@ export const Searchbar = ({
           ? "bg-neutral-100 shadow-[rgb(161,161,161)]"
           : "bg-gray-800 shadow-slate-900"
       }
-    h-12 flex flex-col-reverse justify-center rounded-md w-[50%] px-3 relative shadow-[0_3px_0_0]`}
+    h-12 justify-center w-[50%] rounded-2xl shadow-[0_3px_0_0]`}
     >
-      <input
-        type="text"
-        id="search"
+      <TextInput
         value={searchInput}
         onChange={(e) => setSearchInput(e.target.value)}
-        required
-        className="peer h-full outline-none mt-2"
-      />
-      <label
-        className="transition-all absolute text-gray-500 -translate-y-[50%]
-          peer-focus:text-[0.8rem] peer-focus:top-3 
-          peer-valid:text-[0.8rem] peer-valid:top-3
-          peer-invalid:text-1 peer-invalid:top-[50%]"
-        htmlFor="search"
+        id="search"
       >
-        Search Task
-      </label>
+        <label htmlFor="search">Search Task</label>
+      </TextInput>
     </div>
   );
 };

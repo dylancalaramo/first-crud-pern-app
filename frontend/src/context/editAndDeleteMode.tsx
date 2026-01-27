@@ -7,6 +7,7 @@ import axios from "axios";
 import {
   createContext,
   useContext,
+  useEffect,
   // useEffect,
   useState,
   type ReactNode,
@@ -53,11 +54,11 @@ export const EditAndDeleteTaskProvider = ({
   const [taskQueryArray, setTaskQueryArray] = useState<number[]>([]);
   const queryClient = useQueryClient();
 
-  // useEffect(() => {
-  //   // console.log("Is edit:", isEditMode);
-  //   // console.log("Is delete:", isDeleteMode);
-  //   // console.log(taskQueryArray);
-  // }, [taskQueryArray]);
+  useEffect(() => {
+    // console.log("Is edit:", isEditMode);
+    // console.log("Is delete:", isDeleteMode);
+    // console.log(taskQueryArray);
+  }, [isDeleteMode, taskQueryArray]);
 
   const { mutateAsync: deleteTasks } = useMutation({
     mutationFn: (taskIds: number[]) => handleDeleteRequest(taskIds),

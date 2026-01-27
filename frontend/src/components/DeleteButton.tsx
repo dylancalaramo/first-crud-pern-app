@@ -33,7 +33,10 @@ export const DeleteButton = () => {
           <span className="md:block hidden">Delete</span>
         </div>
       ) : (
-        <X />
+        <div className="flex flex-row items-center justify-center md:w-20 w-fit">
+          <X className="md:mr-1" />
+          <span className="md:block hidden">Cancel</span>
+        </div>
       )}
     </Button>
   );

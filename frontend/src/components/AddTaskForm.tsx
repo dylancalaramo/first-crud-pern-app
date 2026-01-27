@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Button } from "./Button";
 import axios from "axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { setDate } from "date-fns";
+import { TextInput } from "./TextInput";
 
 const handleSubmit = async ({
   task,
@@ -35,7 +35,6 @@ const handleSubmit = async ({
 export const AddTaskForm = () => {
   const [taskInput, setTaskInput] = useState<string>("");
   const [dateInput, setDateInput] = useState<string>("");
-  const taskInputRef = useRef<HTMLInputElement | null>(null);
   const queryClient = useQueryClient();
 
   const handleTaskInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,25 +61,11 @@ export const AddTaskForm = () => {
       className="bg-gray-700 flex flex-col gap-3 md:px-7 px-5 mt-5 w-full text-white rounded-b-lg"
       action={() => addTodo({ task: taskInput, date: dateInput })}
     >
-      <div
-        className="flex flex-col-reverse p-1 px-3 rounded-2xl w-full bg-neutral-200 
-        transition-all h-15 cursor-text shadow-[0_1px_0_1px_rgb(161,161,161)] relative"
-      >
-        <input
-          type="text"
-          id="task"
-          ref={taskInputRef}
-          className={`peer outline-0 h-full mt-2 w-full text-gray-800`}
+      <div className="flex flex-col-reverse rounded-2xl w-full bg-neutral-200 h-15 cursor-text">
+        <TextInput
           value={taskInput}
           onChange={(e) => handleTaskInput(e)}
-          autoComplete="off"
-          required
-        ></input>
-        <div
-          className={`text-gray-500 cursor-text absolute transition-all -translate-y-[50%]
-          peer-focus:top-3 peer-focus:text-[0.8rem]
-          peer-valid:top-3 peer-valid:text-[0.8rem]
-          peer-invalid:top-[50%] peer-invalid: peer-invalid:text-1`}
+          id={"task"}
         >
           <label htmlFor="task">Task</label>
           <span
@@ -90,7 +75,7 @@ export const AddTaskForm = () => {
           >
             {255 - taskInput.length}
           </span>
-        </div>
+        </TextInput>
       </div>
 
       <div

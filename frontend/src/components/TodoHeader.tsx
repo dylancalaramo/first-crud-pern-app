@@ -9,11 +9,11 @@ export const TodoHeader = () => {
     <div
       className={`${theme === "light" ? "bg-neutral-100" : "bg-gray-800 "}
         grid ${
-          isDeleteMode ? "grid-cols-9" : "grid-cols-4"
+          isDeleteMode ? "grid-cols-10" : "grid-cols-4"
         } w-full shadow-md font-bold h-10 rounded-tl-md rounded-tr-md
         [&>span:not(#end)]:border-r *:w-full *:flex *:justify-center *:items-center`}
     >
-      <span className={`${isDeleteMode ? "col-span-4" : "col-span-2"}`}>
+      <span className={`${isDeleteMode ? "col-span-5" : "col-span-2"}`}>
         Task
       </span>
       <span className={`${isDeleteMode ? "col-span-2" : "col-span-1"}`}>

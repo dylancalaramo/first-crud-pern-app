@@ -24,16 +24,8 @@ export interface TodoType {
 const fetchDatabaseData = async (): Promise<TodoType[] | undefined> => {
   try {
     return await axios.get("http://localhost:5000/").then((response) => {
-      // const currentTasks = response.data.map((row: TodoType) => {
-      //   return {
-      //     ...row,
-      //     isEdit: false,
-      //     isDelete: false,
-      //   };
-      // });
-
       const currentTasks = response.data;
-      console.log(currentTasks);
+      // console.log(currentTasks);
       return currentTasks;
     });
   } catch (err) {
@@ -68,7 +60,7 @@ function App() {
       w-full min-h-screen h-max py-3 flex flex-col gap-3`}
     >
       <Navbar trigger={setPopupIsTriggered}></Navbar>
-      <div className="mx-auto w-[80%] max-w-200 flex flex-row items-center justify-between px-5 md">
+      <div className="mx-auto w-[80%] max-w-200 flex flex-row items-center justify-between px-5">
         <Searchbar
           setCurrentTasks={setCurrentTasks}
           table={queriedData}
