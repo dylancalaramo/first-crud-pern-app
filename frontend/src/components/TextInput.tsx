@@ -5,13 +5,19 @@ interface TextInputType {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => unknown;
   id: string;
   children?: ReactNode;
+  inputPlaceholder?: string;
 }
 
-export const TextInput = ({ value, onChange, children }: TextInputType) => {
+export const TextInput = ({
+  value,
+  onChange,
+  children,
+  inputPlaceholder,
+}: TextInputType) => {
   return (
     <div
       className="flex flex-col-reverse p-1 px-3 rounded-2xl w-full  
-        transition-all h-full cursor-text relative bg-amber-50"
+        transition-all h-full cursor-text relative"
     >
       <input
         type="text"
@@ -22,6 +28,7 @@ export const TextInput = ({ value, onChange, children }: TextInputType) => {
         value={value}
         onChange={(e) => onChange(e)}
         autoComplete="off"
+        placeholder={inputPlaceholder ? inputPlaceholder : ""}
         required
       ></input>
       <div

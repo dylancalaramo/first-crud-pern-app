@@ -1,26 +1,39 @@
 import { Trash, X } from "lucide-react";
 import { Button } from "./Button";
 import { useEditAndDeleteTaskContext } from "../context/editAndDeleteMode";
+import type { SetStateAction } from "react";
+import type { TodoArrayType } from "../App";
 
-export const DeleteButton = () => {
-  const {
-    isEditMode,
-    isDeleteMode,
-    setIsDeleteMode,
-    setIsEditMode,
-    setTaskQueryArray,
-  } = useEditAndDeleteTaskContext();
+export const DeleteButton = ({
+  currentTasks,
+  setCurrentTasks,
+}: {
+  currentTasks: TodoArrayType[] | undefined;
+  setCurrentTasks: React.Dispatch<SetStateAction<TodoArrayType[] | undefined>>;
+}) => {
+  const { isEditMode, isDeleteMode, setIsDeleteMode, setIsEditMode } =
+    useEditAndDeleteTaskContext();
 
   const handleDeleteMode = () => {
     setIsEditMode(false);
     setIsDeleteMode((prev) => (prev ? false : true));
-    setTaskQueryArray([]);
+    if (currentTasks) {
+      setCurrentTasks(
+        [...currentTasks].map((row) => ({
+          ...row,
+          data: {
+            ...row.data,
+            editString: "",
+            toBeDeleted: false,
+          },
+        }))
+      );
+    }
   };
 
   const handleCancel = () => {
     setIsDeleteMode(false);
     setIsEditMode(false);
-    setTaskQueryArray([]);
   };
 
   return (

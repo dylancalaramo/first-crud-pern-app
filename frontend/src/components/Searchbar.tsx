@@ -1,5 +1,5 @@
 import { useEffect, useState, type SetStateAction } from "react";
-import type { TodoType } from "../App";
+import type { TodoArrayType } from "../App";
 import { useTheme } from "../context/theme";
 import { TextInput } from "./TextInput";
 
@@ -9,8 +9,8 @@ export const Searchbar = ({
   table,
 }: {
   // currentTasks: TodoType[] | undefined;
-  table: TodoType[] | undefined;
-  setCurrentTasks: React.Dispatch<SetStateAction<TodoType[] | undefined>>;
+  table: TodoArrayType[] | undefined;
+  setCurrentTasks: React.Dispatch<SetStateAction<TodoArrayType[] | undefined>>;
 }) => {
   const { theme } = useTheme();
   const [searchInput, setSearchInput] = useState<string>("");
@@ -18,7 +18,7 @@ export const Searchbar = ({
   useEffect(() => {
     setCurrentTasks(
       table?.filter((row) =>
-        row.task.toLowerCase().startsWith(searchInput.toLowerCase())
+        row.data.task.toLowerCase().startsWith(searchInput.toLowerCase())
       )
     );
   }, [searchInput, setCurrentTasks, table]);

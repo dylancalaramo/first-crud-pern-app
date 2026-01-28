@@ -11,20 +11,38 @@ import { AddTaskForm } from "./components/AddTaskForm";
 import { EditButton } from "./components/EditButton";
 import { DeleteButton } from "./components/DeleteButton";
 // import { useEffect } from "react";
-
-export interface TodoType {
-  id: number;
+export interface TodoDataType {
   task: string;
   created_at: string;
   deadline: string;
-  // isEdit: boolean;
-  // isDelete: boolean;
+  editString: string;
+  toBeDeleted: boolean;
 }
 
-const fetchDatabaseData = async (): Promise<TodoType[] | undefined> => {
+export interface TodoArrayType {
+  id: number;
+  data: TodoDataType;
+}
+
+const fetchDatabaseData = async (): Promise<TodoArrayType[] | undefined> => {
   try {
     return await axios.get("http://localhost:5000/").then((response) => {
-      const currentTasks = response.data;
+      // const currentTasks = [
+      //   { ...response.data, editString: "", toBeDeleted: false },
+      // ];
+      const currentTasks: TodoArrayType[] = response.data.map(
+        (todo: TodoArrayType) => ({
+          id: todo.id,
+          data: {
+            task: todo.data.task,
+            created_at: todo.data.created_at,
+            deadline: todo.data.deadline,
+            editString: "",
+            toBeDeleted: false,
+          },
+        })
+      );
+
       // console.log(currentTasks);
       return currentTasks;
     });
@@ -37,7 +55,7 @@ const fetchDatabaseData = async (): Promise<TodoType[] | undefined> => {
 function App() {
   const [popupIsTriggered, setPopupIsTriggered] = useState<boolean>(false);
   const { theme } = useTheme();
-  const [currentTasks, setCurrentTasks] = useState<TodoType[] | undefined>(
+  const [currentTasks, setCurrentTasks] = useState<TodoArrayType[] | undefined>(
     undefined
   );
   const { data: queriedData } = useQuery({
@@ -49,6 +67,18 @@ function App() {
   useEffect(() => {
     setCurrentTasks(queriedData);
   }, [queriedData]);
+
+  // //handles automatic sorting of task array whenever:
+  // //row delete checkbox is selected,
+  // //searching for row, etc
+  // //can be changed in the future to add sort feature
+  // useEffect(() => {
+  //   if (currentTasks) {
+  //     setCurrentTasks(
+  //       [...currentTasks].sort((taskA, taskB) => taskA.id - taskB.id)
+  //     );
+  //   }
+  // }, [currentTasks]);
 
   return (
     <div
@@ -66,8 +96,11 @@ function App() {
           table={queriedData}
         ></Searchbar>
         <div className="h-full flex gap-4">
-          <EditButton />
-          <DeleteButton />
+          <EditButton currentTasks={currentTasks} />
+          <DeleteButton
+            currentTasks={currentTasks}
+            setCurrentTasks={setCurrentTasks}
+          />
         </div>
       </div>
 
@@ -79,6 +112,7 @@ function App() {
                 todo={row}
                 key={row.id}
                 setCurrentTasks={setCurrentTasks}
+                currentTasks={currentTasks}
               />
             );
           })

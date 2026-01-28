@@ -7,7 +7,6 @@ import axios from "axios";
 import {
   createContext,
   useContext,
-  useEffect,
   // useEffect,
   useState,
   type ReactNode,
@@ -19,16 +18,16 @@ interface EditAndDeleteTaskType {
   isDeleteMode: boolean;
   setIsEditMode: React.Dispatch<SetStateAction<boolean>>;
   setIsDeleteMode: React.Dispatch<SetStateAction<boolean>>;
-  taskQueryArray: number[];
-  setTaskQueryArray: React.Dispatch<SetStateAction<number[]>>;
   deleteTasks: UseMutateAsyncFunction<void, Error, number[]>;
 }
 
-const handleDeleteRequest = async (taskQueryArray: number[]): Promise<void> => {
+const handleDeleteRequest = async (
+  toDeleteIdArray: number[]
+): Promise<void> => {
   console.log("here");
   return axios
     .delete("http://localhost:5000", {
-      data: { ids: taskQueryArray },
+      data: { ids: toDeleteIdArray },
     })
     .then((response) => {
       console.log(response.status);
@@ -39,6 +38,8 @@ const handleDeleteRequest = async (taskQueryArray: number[]): Promise<void> => {
       return;
     });
 };
+
+// const handleEditRequest = async(edit);
 
 const EditAndDeleteTaskContext = createContext<
   EditAndDeleteTaskType | undefined
@@ -51,21 +52,21 @@ export const EditAndDeleteTaskProvider = ({
 }) => {
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [isDeleteMode, setIsDeleteMode] = useState<boolean>(false);
-  const [taskQueryArray, setTaskQueryArray] = useState<number[]>([]);
+
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    // console.log("Is edit:", isEditMode);
-    // console.log("Is delete:", isDeleteMode);
-    // console.log(taskQueryArray);
-  }, [isDeleteMode, taskQueryArray]);
+  // useEffect(() => {
+  //   // console.log("Is edit:", isEditMode);
+  //   // console.log("Is delete:", isDeleteMode);
+  //   // console.log(taskQueryArray);
+  // }, [isDeleteMode, taskQueryArray]);
 
   const { mutateAsync: deleteTasks } = useMutation({
     mutationFn: (taskIds: number[]) => handleDeleteRequest(taskIds),
     onSuccess: () => {
       setIsEditMode(false);
       setIsDeleteMode(false);
-      setTaskQueryArray([]);
+
       queryClient.invalidateQueries({
         queryKey: ["database"],
       });
@@ -79,8 +80,6 @@ export const EditAndDeleteTaskProvider = ({
         isDeleteMode,
         setIsEditMode,
         setIsDeleteMode,
-        taskQueryArray,
-        setTaskQueryArray,
         deleteTasks,
       }}
     >

@@ -12,8 +12,19 @@ app.use(cors());
 //routes
 app.get("/", async (req, res) => {
   try {
-    const rows = await pool.query("SELECT * FROM todo");
-    res.status(200).send(rows.rows);
+    const query = await pool.query("SELECT * FROM todo");
+
+    const result = query.rows.map((row) => ({
+      id: row.id,
+      data: {
+        task: row.task,
+        created_at: row.created_at,
+        deadline: row.deadline,
+      },
+    }));
+    // console.log(query);
+
+    res.status(200).send(result);
   } catch (err) {
     console.log(err);
     //Change the send message when in prod

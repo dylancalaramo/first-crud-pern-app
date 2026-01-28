@@ -1,28 +1,60 @@
 import { Pencil } from "lucide-react";
 import { Button } from "./Button";
 import { useEditAndDeleteTaskContext } from "../context/editAndDeleteMode";
+import type { TodoArrayType } from "../App";
+import { useMemo } from "react";
 
-export const EditButton = () => {
+export const EditButton = ({
+  currentTasks,
+}: {
+  currentTasks: TodoArrayType[] | undefined;
+}) => {
   const {
     isEditMode,
     isDeleteMode,
-    taskQueryArray,
     setIsEditMode,
     setIsDeleteMode,
     deleteTasks,
   } = useEditAndDeleteTaskContext();
 
+  const toBeDeletedCount = useMemo(() => {
+    return currentTasks
+      ? currentTasks.filter((row) => row.data.toBeDeleted).length
+      : 0;
+  }, [currentTasks]);
+
+  const toBeEditedCount = useMemo(() => {
+    return currentTasks
+      ? currentTasks.filter((row) => row.data.editString !== "").length
+      : 0;
+  }, [currentTasks]);
+
   const handleEditMode = () => {
+    //check if user wants to delete first
     if (isDeleteMode) {
-      if (taskQueryArray.length > 0) {
-        deleteTasks(taskQueryArray);
+      if (currentTasks && currentTasks.length > 0) {
+        //check if there are rows currently selected to be deleted
+        const toDeleteIdArray = currentTasks
+          .filter((row) => row.data.toBeDeleted)
+          .map((row) => {
+            return row.id;
+          });
+        //if there are selected rows
+        if (toDeleteIdArray.length > 0) {
+          deleteTasks(toDeleteIdArray);
+        } else {
+          //if there are no selected rows, cancel operation
+          console.log("There is nothing to delete or edit");
+          return;
+        }
         return;
       } else {
+        //catch when there are no current rows
         console.log("There is nothing to delete or edit");
       }
     } else if (isEditMode) {
       //add edit function
-      if (taskQueryArray.length > 0) {
+      if (currentTasks && currentTasks.length > 0) {
         return;
       } else {
         console.log("There is nothing to delete or edit");
@@ -45,8 +77,8 @@ export const EditButton = () => {
       ) : (
         <span>
           {isEditMode
-            ? `Save (${taskQueryArray.length})`
-            : `Delete (${taskQueryArray.length})`}
+            ? `Save (${toBeEditedCount})`
+            : `Delete (${toBeDeletedCount})`}
         </span>
       )}
     </Button>
