@@ -110,13 +110,17 @@ export const TodoRow = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [taskEditInput]);
 
-  useEffect(() => {
-    console.log(currentTasks);
-  }, [currentTasks]);
+  // useEffect(() => {
+  //   console.log(currentTasks);
+  // }, [currentTasks]);
 
   return (
     <div
-      className={`${theme === "light" ? "bg-neutral-100" : "bg-gray-800"}
+      className={`${
+        theme === "light"
+          ? "bg-neutral-100 *:border-gray-300"
+          : "bg-gray-800 *:border-gray-700"
+      }
         grid ${isDeleteMode ? "grid-cols-10" : "grid-cols-4"}
         w-full shadow-md
         min-h-15 h-fit font-roboto overflow-auto
@@ -131,15 +135,28 @@ export const TodoRow = ({
           <span className={`${isDeleteMode ? "col-span-2" : "col-span-1"}`}>
             {deadline}
           </span>
-          <span className={`${isDeleteMode ? "col-span-2" : "col-span-1"}`}>
+          <span
+            className={`${isDeleteMode ? "col-span-2" : "col-span-1"}`}
+            id="end"
+          >
             {createdDate}
           </span>
         </>
       ) : (
         <div className="w-full h-full col-span-2">
           <div
-            className="w-full h-[2.5em] inset-shadow-sm 
-            inset-shadow-gray-500 rounded-lg"
+            className={`
+            ${
+              taskEditInput === ""
+                ? //if text input field is empty
+                  "border-red-400"
+                : taskEditInput !== todo.data.task
+                ? "border-blue-500"
+                : //if there's no change in task input
+                  "border-gray-500"
+            }
+            ${theme === "light" ? "**:text-black" : "**:text-gray-300"}
+            border-b-2 w-full h-[2.5em] transition-all`}
           >
             <TextInput
               value={taskEditInput}
@@ -152,7 +169,7 @@ export const TodoRow = ({
       )}
 
       {isDeleteMode && (
-        <div className={`${isDeleteMode ? "block" : "hidden"}`}>
+        <div className={`${isDeleteMode ? "block" : "hidden"}`} id="end">
           <input
             type="checkbox"
             value="yes"

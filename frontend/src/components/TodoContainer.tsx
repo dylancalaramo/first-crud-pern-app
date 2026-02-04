@@ -9,8 +9,8 @@ export const TodoContainer = ({ children }: { children?: ReactNode }) => {
       className={`
         ${
           theme === "light"
-            ? "bg-neutral-400 **:border-stone-300"
-            : "bg-slate-900 **:border-gray-700"
+            ? "bg-neutral-400 border-stone-300"
+            : "bg-slate-900 border-gray-700"
         }
         flex flex-col min-h-[80%] h-fit w-[80%] max-w-200 mx-auto rounded-md
         justify-between items-center shadow-md 

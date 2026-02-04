@@ -7,11 +7,16 @@ export const TodoHeader = () => {
   const { isDeleteMode } = useEditAndDeleteTaskContext();
   return (
     <div
-      className={`${theme === "light" ? "bg-neutral-100" : "bg-gray-800 "}
+      className={`
+         ${
+           theme === "light"
+             ? "bg-neutral-100 *:border-gray-300"
+             : "bg-gray-800 *:border-gray-700"
+         }
         grid ${
           isDeleteMode ? "grid-cols-10" : "grid-cols-4"
         } w-full shadow-md font-bold h-10 rounded-tl-md rounded-tr-md
-        [&>span:not(#end)]:border-r *:w-full *:flex *:justify-center *:items-center`}
+         *:w-full *:flex *:justify-center *:items-center [&>span:not(#end)]:border-r`}
     >
       <span className={`${isDeleteMode ? "col-span-5" : "col-span-2"}`}>
         Task
@@ -19,7 +24,10 @@ export const TodoHeader = () => {
       <span className={`${isDeleteMode ? "col-span-2" : "col-span-1"}`}>
         Deadline
       </span>
-      <span className={`${isDeleteMode ? "col-span-2" : "col-span-1"}`}>
+      <span
+        className={`${isDeleteMode ? "col-span-2" : "col-span-1"}`}
+        id="end"
+      >
         Created at
       </span>
       {isDeleteMode && (

@@ -24,10 +24,33 @@ interface EditAndDeleteTaskType {
 const handleDeleteRequest = async (
   toDeleteIdArray: number[]
 ): Promise<void> => {
-  console.log("here");
+  // console.log("here");
   return axios
     .delete("http://localhost:5000", {
       data: { ids: toDeleteIdArray },
+    })
+    .then((response) => {
+      console.log(response.status);
+      return;
+    })
+    .catch((error) => {
+      console.log(error);
+      return;
+    });
+};
+
+const handleEditRequest = async (
+  toEditArray: {
+    id: number;
+    edit_string: string;
+    deadline: string;
+  }[]
+): Promise<void> => {
+  return axios
+    .put("https://localhost:5000", {
+      data: {
+        ...toEditArray,
+      },
     })
     .then((response) => {
       console.log(response.status);
@@ -66,7 +89,23 @@ export const EditAndDeleteTaskProvider = ({
     onSuccess: () => {
       setIsEditMode(false);
       setIsDeleteMode(false);
+      queryClient.invalidateQueries({
+        queryKey: ["database"],
+      });
+    },
+  });
 
+  const { mutateAsync: editTasks } = useMutation({
+    mutationFn: (
+      toEditArray: {
+        id: number;
+        edit_string: string;
+        deadline: string;
+      }[]
+    ) => handleEditRequest(toEditArray),
+    onSuccess: () => {
+      setIsEditMode(false);
+      setIsDeleteMode(false);
       queryClient.invalidateQueries({
         queryKey: ["database"],
       });

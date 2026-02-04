@@ -4,9 +4,11 @@ const app = express();
 const { pool } = require("./db");
 const PORT = process.env.SERVER_PORT || 5000;
 const cors = require("cors");
-console.log(process.env.POSTGRES_HOST);
+// console.log(process.env.DEV_POSTGRES_HOST);
+// pool.connect();
 //middelwares
 app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 //routes
@@ -44,6 +46,58 @@ app.post("/", async (req, res) => {
     console.log(err);
     //Change the send message when in prod
     res.status(400).send(`${err.message}`);
+  }
+});
+
+app.put("/", async (req, res) => {
+  const data = req.body;
+  if (!req.body || data.length === 0 || !data) {
+    res.status(400).send({ message: "there is nothing to edit" });
+    return;
+  }
+
+  const handleValues = (data) => {
+    const values = [];
+
+    data.forEach((row) => {
+      values.push(row.id, row.edit_string, row.deadline);
+    });
+
+    const placeholder = data
+      .map((row = "", index) => {
+        const placeholderIndex = index * 3 + 1;
+        return `($${placeholderIndex}::int, $${placeholderIndex + 1}::text, $${
+          placeholderIndex + 2
+        }::timestamptz)`;
+      })
+      .join(", ");
+
+    return {
+      values: values,
+      placeholder: placeholder,
+    };
+  };
+
+  const { values, placeholder } = handleValues(data);
+
+  try {
+    const queryString = `
+    UPDATE todo AS t
+    SET
+      task = u.task,
+      deadline = u.deadline
+    FROM
+      (VALUES ${placeholder})
+    AS u(id, task, deadline)
+    WHERE t.id = u.id`;
+
+    await pool.query(queryString, values);
+    res
+      .status(200)
+      .send({ message: `Succesfully updated: ${data.length} rows` });
+  } catch (err) {
+    console.log(err.message);
+    res.status(400).send({ message: "server error" });
   }
 });
 
