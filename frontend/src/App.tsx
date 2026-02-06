@@ -10,12 +10,14 @@ import { useEffect, useState } from "react";
 import { AddTaskForm } from "./components/AddTaskForm";
 import { EditButton } from "./components/EditButton";
 import { DeleteButton } from "./components/DeleteButton";
+// import { useEditAndDeleteTaskContext } from "./context/editAndDeleteMode";
 // import { useEffect } from "react";
 export interface TodoDataType {
   task: string;
   created_at: string;
   deadline: string;
   editString: string;
+  deadlineEditString: string;
   toBeDeleted: boolean;
 }
 
@@ -38,6 +40,7 @@ const fetchDatabaseData = async (): Promise<TodoArrayType[] | undefined> => {
             created_at: todo.data.created_at,
             deadline: todo.data.deadline,
             editString: "",
+            deadlineEditString: "",
             toBeDeleted: false,
           },
         })
@@ -58,6 +61,8 @@ function App() {
   const [currentTasks, setCurrentTasks] = useState<TodoArrayType[] | undefined>(
     undefined
   );
+  // const { isEditMode, isDeleteMode } = useEditAndDeleteTaskContext();
+
   const { data: queriedData } = useQuery({
     queryFn: fetchDatabaseData,
     queryKey: ["database"],
@@ -67,6 +72,40 @@ function App() {
   useEffect(() => {
     setCurrentTasks(queriedData);
   }, [queriedData]);
+
+  // useEffect(() => {
+  //   if (!isEditMode) {
+  //     console.log("here");
+  //     console.log(isEditMode);
+
+  //     setCurrentTasks(
+  //       currentTasks?.map((todo) => ({
+  //         ...todo,
+  //         data: {
+  //           ...todo.data,
+  //           editString: "",
+  //         },
+  //       }))
+  //     );
+  //   }
+
+  //   if (!isDeleteMode) {
+  //     setCurrentTasks(
+  //       currentTasks?.map((todo) => ({
+  //         ...todo,
+  //         data: {
+  //           ...todo.data,
+  //           toBeDeleted: false,
+  //         },
+  //       }))
+  //     );
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [isEditMode, isDeleteMode]);
+
+  useEffect(() => {
+    console.log(currentTasks);
+  }, [currentTasks]);
 
   // //handles automatic sorting of task array whenever:
   // //row delete checkbox is selected,

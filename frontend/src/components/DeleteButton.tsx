@@ -34,6 +34,17 @@ export const DeleteButton = ({
   const handleCancel = () => {
     setIsDeleteMode(false);
     setIsEditMode(false);
+
+    setCurrentTasks(
+      currentTasks?.map((todo) => ({
+        ...todo,
+        data: {
+          ...todo.data,
+          editString: "",
+          toBeDeleted: false,
+        },
+      }))
+    );
   };
 
   return (

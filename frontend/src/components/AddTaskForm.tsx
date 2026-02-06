@@ -3,6 +3,7 @@ import { Button } from "./Button";
 import axios from "axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { TextInput } from "./TextInput";
+import { useEditAndDeleteTaskContext } from "../context/editAndDeleteMode";
 
 const handleSubmit = async ({
   task,
@@ -36,6 +37,7 @@ export const AddTaskForm = () => {
   const [taskInput, setTaskInput] = useState<string>("");
   const [dateInput, setDateInput] = useState<string>("");
   const queryClient = useQueryClient();
+  const { setIsEditMode, setIsDeleteMode } = useEditAndDeleteTaskContext();
 
   const handleTaskInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.length <= 255) {
@@ -50,6 +52,8 @@ export const AddTaskForm = () => {
     onSuccess: () => {
       setTaskInput("");
       setDateInput("");
+      setIsDeleteMode(false);
+      setIsEditMode(false);
       queryClient.invalidateQueries({
         queryKey: ["database"],
       });

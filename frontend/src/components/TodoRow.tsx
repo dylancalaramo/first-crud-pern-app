@@ -22,21 +22,42 @@ export const TodoRow = ({
 }) => {
   const { theme } = useTheme();
   const { isEditMode, isDeleteMode } = useEditAndDeleteTaskContext();
-  const [taskEditInput, setTaskEditInput] = useState<string>("");
+  const [taskEditInput, setTaskEditInput] = useState<string>(
+    todo.data.task || ""
+  );
+  const [deadlineEditInput, setDeadlineEditInput] = useState<string>(
+    //yyyy-MM-dd is the standard format for html date inputs
+    //format cannot be changed
+    format(new Date(todo.data.deadline), "yyyy-MM-dd") || ""
+  );
   const deleteCheckboxRef = useRef<HTMLInputElement | null>(null);
+  const dateInputRef = useRef<HTMLInputElement | null>(null);
 
+  //formated timestamptz to MMMM d, yyyy to display on frontend
   const createdDate = useMemo(
     () => format(new Date(todo.data.created_at), "MMMM d, yyyy"),
     [todo]
   );
-  const deadline = useMemo(
+  //formated yyyy-MM-dd to MMMM d, yyyy to display on frontend
+  const deadlineFormatted = useMemo(
     () => format(new Date(todo.data.deadline), "MMMM d, yyyy"),
     [todo]
   );
 
+  const deadlineEditInputFormatted = useMemo(() => {
+    //set date back to initial deadline date to avoid crash from inputting an empty
+    //string in format new Date function when user clicks clear in deadline input field
+    if (deadlineEditInput !== "") {
+      return format(new Date(deadlineEditInput), "MMMM d, yyyy");
+    } else {
+      return deadlineFormatted;
+    }
+  }, [deadlineEditInput, deadlineFormatted]);
+
   const handleDelete = () => {
     //if checkbox is checked
     //setToBeDeleted to true
+    console.log("is checked:", deleteCheckboxRef.current?.checked);
     if (deleteCheckboxRef.current?.checked) {
       setCurrentTasks(
         [
@@ -66,18 +87,27 @@ export const TodoRow = ({
     }
   };
 
-  //resets edit task input state,
-  //whenever user leaves delete task mode
+  //resets edit task input state whenever user leaves delete task mode
   useEffect(() => {
     const handleEditReset = () => {
       if (!isEditMode) {
         setTaskEditInput("");
+        setDeadlineEditInput(
+          format(new Date(todo.data.deadline), "yyyy-MM-dd")
+        );
       } else {
         setTaskEditInput(todo.data.task);
       }
     };
     handleEditReset();
-  }, [isEditMode, todo.data.task]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditMode]);
+
+  // useEffect(() => {
+  //   console.log(deadlineEditInput);
+  //   // console.log(deadline);
+  //   console.log(format(new Date(todo.data.deadline), "dd/mm/yyyy"));
+  // }, [deadlineEditInput]);
 
   useEffect(() => {
     if (taskEditInput !== todo.data.task && taskEditInput !== "") {
@@ -110,6 +140,47 @@ export const TodoRow = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [taskEditInput]);
 
+  useEffect(() => {
+    if (
+      deadlineEditInputFormatted !== deadlineFormatted &&
+      deadlineEditInput !== ""
+    ) {
+      setCurrentTasks(
+        [
+          ...currentTasks.filter((row) => row.id !== todo.id),
+          {
+            ...todo,
+            data: {
+              ...todo.data,
+              deadlineEditString: new Date(deadlineEditInput)
+                .getTime()
+                .toString(),
+            },
+          },
+        ].sort((taskA, taskB) => taskA.id - taskB.id)
+      );
+    } else {
+      setCurrentTasks(
+        [
+          ...currentTasks.filter((row) => row.id !== todo.id),
+          {
+            ...todo,
+            data: {
+              ...todo.data,
+              deadlineEditString: "",
+            },
+          },
+        ].sort((taskA, taskB) => taskA.id - taskB.id)
+      );
+    }
+  }, [deadlineEditInput]);
+
+  // useEffect(() => {
+  //   console.log(deadlineEditInputFormatted !== deadlineFormatted);
+  //   console.log(format(new Date(deadlineEditInput).getTime(), "yyyy-m-dd"));
+  //   console.log(new Date(deadlineEditInput).getTime().toString());
+  // }, [deadlineEditInput]);
+
   // useEffect(() => {
   //   console.log(currentTasks);
   // }, [currentTasks]);
@@ -133,7 +204,7 @@ export const TodoRow = ({
             {todo.data.task}
           </span>
           <span className={`${isDeleteMode ? "col-span-2" : "col-span-1"}`}>
-            {deadline}
+            {deadlineFormatted}
           </span>
           <span
             className={`${isDeleteMode ? "col-span-2" : "col-span-1"}`}
@@ -143,29 +214,71 @@ export const TodoRow = ({
           </span>
         </>
       ) : (
-        <div className="w-full h-full col-span-2">
-          <div
-            className={`
-            ${
-              taskEditInput === ""
-                ? //if text input field is empty
-                  "border-red-400"
-                : taskEditInput !== todo.data.task
-                ? "border-blue-500"
-                : //if there's no change in task input
-                  "border-gray-500"
-            }
+        <>
+          <div className="w-full h-full col-span-2">
+            <div
+              className={`${
+                // taskEditInput !== todo.data.task
+                //   ? taskEditInput === ""
+                //     ? //if the text input is empty (invalid)
+                //       "border-red-400"
+                //     : //if text input field is different from the original task
+                //       "border-blue-500"
+                //   : "border-gray-500"
+                taskEditInput === ""
+                  ? "border-red-400"
+                  : taskEditInput !== todo.data.task
+                  ? "border-blue-500"
+                  : "border-gray-500"
+              }
             ${theme === "light" ? "**:text-black" : "**:text-gray-300"}
-            border-b-2 w-full h-[2.5em] transition-all`}
-          >
-            <TextInput
-              value={taskEditInput}
-              onChange={(e) => setTaskEditInput(e.target.value)}
-              id={`task-${todo.id}`}
-              inputPlaceholder={todo.data.task}
-            ></TextInput>
+            border-b-2 w-full h-[2.5em]`}
+            >
+              <TextInput
+                value={taskEditInput}
+                onChange={(e) => setTaskEditInput(e.target.value)}
+                id={`task-${todo.id}`}
+                inputPlaceholder={todo.data.task}
+              ></TextInput>
+            </div>
           </div>
-        </div>
+          <div className="w-full h-full col-span-1">
+            <div
+              className={`
+            ${
+              deadlineFormatted !== deadlineEditInputFormatted
+                ? deadlineEditInputFormatted === ""
+                  ? //if the deadline input is empty (invalid)
+                    "border-red-400"
+                  : //if text input field is different from the original task
+                    "border-blue-500"
+                : "border-gray-500"
+            }
+              border-b-2 w-full h-[2.5em] transition-all flex items-center`}
+            >
+              <input
+                type="date"
+                className="h-0 absolute invisible"
+                value={deadlineEditInput}
+                id="date-input"
+                ref={dateInputRef}
+                onChange={(e) => setDeadlineEditInput(e.target.value)}
+              ></input>
+              <label
+                htmlFor="date-input"
+                className="mx-auto"
+                onClick={() => {
+                  if (dateInputRef.current) {
+                    dateInputRef.current.showPicker();
+                  }
+                }}
+              >
+                {deadlineEditInputFormatted}
+              </label>
+            </div>
+          </div>
+          <div className="w-full h-full col-span-1">{createdDate}</div>
+        </>
       )}
 
       {isDeleteMode && (

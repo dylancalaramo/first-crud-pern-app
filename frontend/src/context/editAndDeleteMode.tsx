@@ -12,19 +12,29 @@ import {
   type ReactNode,
   type SetStateAction,
 } from "react";
+import type { TodoArrayType } from "../App";
 
+interface EditDataType {
+  id: number;
+  edit_string: string;
+  deadline: string;
+}
 interface EditAndDeleteTaskType {
   isEditMode: boolean;
   isDeleteMode: boolean;
   setIsEditMode: React.Dispatch<SetStateAction<boolean>>;
   setIsDeleteMode: React.Dispatch<SetStateAction<boolean>>;
   deleteTasks: UseMutateAsyncFunction<void, Error, number[]>;
+  editTasks: UseMutateAsyncFunction<void, Error, TodoArrayType[]>;
 }
 
 const handleDeleteRequest = async (
   toDeleteIdArray: number[]
 ): Promise<void> => {
-  // console.log("here");
+  if (!toDeleteIdArray) {
+    console.log("Request error: no rows selected to delete");
+    return;
+  }
   return axios
     .delete("http://localhost:5000", {
       data: { ids: toDeleteIdArray },
@@ -40,18 +50,37 @@ const handleDeleteRequest = async (
 };
 
 const handleEditRequest = async (
-  toEditArray: {
-    id: number;
-    edit_string: string;
-    deadline: string;
-  }[]
+  toEditArray: TodoArrayType[]
 ): Promise<void> => {
+  if (!toEditArray) {
+    console.log("Request error: there are no rows to edit");
+    return;
+  }
+  const data: EditDataType[] = [];
+  toEditArray.forEach((task) => {
+    const dateTimestamptz = new Date(
+      parseInt(task.data.deadlineEditString)
+    ).toISOString();
+    data.push({
+      id: task.id,
+      edit_string: task.data.editString,
+      deadline: dateTimestamptz,
+    });
+  });
+  console.log(data);
+
   return axios
-    .put("https://localhost:5000", {
-      data: {
-        ...toEditArray,
+    .put(
+      "http://localhost:5000",
+      {
+        data: data,
       },
-    })
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
     .then((response) => {
       console.log(response.status);
       return;
@@ -96,13 +125,8 @@ export const EditAndDeleteTaskProvider = ({
   });
 
   const { mutateAsync: editTasks } = useMutation({
-    mutationFn: (
-      toEditArray: {
-        id: number;
-        edit_string: string;
-        deadline: string;
-      }[]
-    ) => handleEditRequest(toEditArray),
+    mutationFn: (toEditArray: TodoArrayType[]) =>
+      handleEditRequest(toEditArray),
     onSuccess: () => {
       setIsEditMode(false);
       setIsDeleteMode(false);
@@ -120,6 +144,7 @@ export const EditAndDeleteTaskProvider = ({
         setIsEditMode,
         setIsDeleteMode,
         deleteTasks,
+        editTasks,
       }}
     >
       {children}

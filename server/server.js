@@ -4,12 +4,15 @@ const app = express();
 const { pool } = require("./db");
 const PORT = process.env.SERVER_PORT || 5000;
 const cors = require("cors");
+const { corsOptions } = require("./corsOptions.js");
+
 // console.log(process.env.DEV_POSTGRES_HOST);
 // pool.connect();
 //middelwares
 app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+
+app.use(cors(corsOptions));
 
 //routes
 app.get("/", async (req, res) => {
@@ -50,7 +53,8 @@ app.post("/", async (req, res) => {
 });
 
 app.put("/", async (req, res) => {
-  const data = req.body;
+  const { data } = req.body;
+  // console.log(data);
   if (!req.body || data.length === 0 || !data) {
     res.status(400).send({ message: "there is nothing to edit" });
     return;

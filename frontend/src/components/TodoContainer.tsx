@@ -7,11 +7,7 @@ export const TodoContainer = ({ children }: { children?: ReactNode }) => {
   return (
     <div
       className={`
-        ${
-          theme === "light"
-            ? "bg-neutral-400 border-stone-300"
-            : "bg-slate-900 border-gray-700"
-        }
+        ${theme === "light" ? "bg-neutral-400 " : "bg-slate-900"}
         flex flex-col min-h-[80%] h-fit w-[80%] max-w-200 mx-auto rounded-md
         justify-between items-center shadow-md 
         font-open-sans md:text-base text-xs`}

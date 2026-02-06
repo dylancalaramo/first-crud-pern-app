@@ -15,6 +15,7 @@ export const EditButton = ({
     setIsEditMode,
     setIsDeleteMode,
     deleteTasks,
+    editTasks,
   } = useEditAndDeleteTaskContext();
 
   const toBeDeletedCount = useMemo(() => {
@@ -25,7 +26,10 @@ export const EditButton = ({
 
   const toBeEditedCount = useMemo(() => {
     return currentTasks
-      ? currentTasks.filter((row) => row.data.editString !== "").length
+      ? currentTasks.filter(
+          (row) =>
+            row.data.editString !== "" || row.data.deadlineEditString !== ""
+        ).length
       : 0;
   }, [currentTasks]);
 
@@ -53,8 +57,22 @@ export const EditButton = ({
         console.log("There is nothing to delete or edit");
       }
     } else if (isEditMode) {
-      //add edit function
+      //check if todos exist
       if (currentTasks && currentTasks.length > 0) {
+        //check if any of the todos contain an edit string
+        const toEdditArray = currentTasks.filter(
+          (task) =>
+            task.data.editString !== "" || task.data.deadlineEditString !== ""
+        );
+        // console.log(toEdditArray);
+        if (toEdditArray.length !== 0) {
+          //call edit task mutate function to query to server
+          editTasks(toEdditArray);
+        } else {
+          //there are no tasks to edit if edit array is empty
+          console.log("There is nothing to delete or edit");
+          return;
+        }
         return;
       } else {
         console.log("There is nothing to delete or edit");
